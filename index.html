@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script
+			async
+			src="https://www.googletagmanager.com/gtag/js?id=G-KC28TS4RKY"
+		></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag("js", new Date());
+
+			gtag("config", "G-KC28TS4RKY");
+		</script>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>MOSFET Transistors</title>
+		<link href="./style.css" rel="stylesheet" />
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<script
+			defer
+			src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"
+		></script>
+		<script
+			defer
+			src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"
+		></script>
+		<script
+			defer
+			src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"
+		></script>
+		<script
+			defer
+			src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"
+		></script>
+		<script
+			defer
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+		></script>
+
+		<!-- band data -->
+		<script defer src="./band_diagram/xPositionData.js"></script>
+		<script defer src="./band_diagram/vd00_vg00.js"></script>
+		<script defer src="./band_diagram/vd00_vg05.js"></script>
+		<script defer src="./band_diagram/vd00_vg10.js"></script>
+		<script defer src="./band_diagram/vd00_vg13.js"></script>
+		<script defer src="./band_diagram/vd01_vg00.js"></script>
+		<script defer src="./band_diagram/vd01_vg05.js"></script>
+		<script defer src="./band_diagram/vd01_vg10.js"></script>
+		<script defer src="./band_diagram/vd01_vg13.js"></script>
+		<script defer src="./band_diagram/vd03_vg00.js"></script>
+		<script defer src="./band_diagram/vd03_vg05.js"></script>
+		<script defer src="./band_diagram/vd03_vg10.js"></script>
+		<script defer src="./band_diagram/vd03_vg13.js"></script>
+		<script defer src="./band_diagram/vd10_vg00.js"></script>
+		<script defer src="./band_diagram/vd10_vg05.js"></script>
+		<script defer src="./band_diagram/vd10_vg10.js"></script>
+		<script defer src="./band_diagram/vd10_vg13.js"></script>
+
+		<!-- profiles -->
+		<script defer src="./voltage_profiles/vd00_vg00.js"></script>
+		<script defer src="./voltage_profiles/vd00_vg05.js"></script>
+		<script defer src="./voltage_profiles/vd00_vg10.js"></script>
+		<script defer src="./voltage_profiles/vd00_vg13.js"></script>
+		<script defer src="./voltage_profiles/vd01_vg00.js"></script>
+		<script defer src="./voltage_profiles/vd01_vg05.js"></script>
+		<script defer src="./voltage_profiles/vd01_vg10.js"></script>
+		<script defer src="./voltage_profiles/vd01_vg13.js"></script>
+		<script defer src="./voltage_profiles/vd03_vg00.js"></script>
+		<script defer src="./voltage_profiles/vd03_vg05.js"></script>
+		<script defer src="./voltage_profiles/vd03_vg10.js"></script>
+		<script defer src="./voltage_profiles/vd03_vg13.js"></script>
+		<script defer src="./voltage_profiles/vd10_vg00.js"></script>
+		<script defer src="./voltage_profiles/vd10_vg05.js"></script>
+		<script defer src="./voltage_profiles/vd10_vg10.js"></script>
+		<script defer src="./voltage_profiles/vd10_vg13.js"></script>
+
+		<!-- other scripts -->
+		<script defer src="./highResGrid.js"></script>
+		<script defer src="./tools.js"></script>
+		<script defer src="./scroll.js"></script>
+		<script defer src="./charge.js"></script>
+		<script defer src="./particle.js"></script>
+		<script defer src="./wireCharge.js"></script>
+		<script defer src="./sketch.js"></script>
+	</head>
+
+	<body id="body_parent" onload="StartScroll()">
+		<!-- <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a> -->
+		<div class="container">
+			<div class="row title">
+				<button class="backButton" type="button" onclick="">
+					<a href="../index.html">← All chapters</a>
+				</button>
+				<h1 class="col-lg-12">MOSFET TRANSISTORS</h1>
+				<div class="col-lg-1"></div>
+				<p class="col-lg-10">
+					Metal-Oxide-Semiconductor Field Effect Transistors (MOSFET) are the
+					most important electronic device in modern world. A MOSFET is a
+					voltage-controlled switch in which the flow of current between its
+					drain and source terminals is turned on or off depending on the
+					voltage applied to the gate terminal. After learning how an MOS
+					capacitor works, we are ready to see how a MOSFET operates.
+				</p>
+				<div class="col-lg-1"></div>
+				<div class="col-lg-1"></div>
+				<p class="col-lg-10 browser-spec">
+					Please use <b>Chrome</b> or <b>Firefox</b>. This chapter may have
+					issues on Safari.
+				</p>
+			</div>
+			<div class="row row1" id="scene0"></div>
+			<div class="row row1" id="scene1">
+				<div class="col-lg-4">
+					<h1>Apply drain voltage</h1>
+
+					<p>
+						Let’s assume no voltage is applied to the gate. Apply a voltage
+						between the source and drain and see what happens.
+						<span class="highlight">
+							You can hover over the transistor to see the vertical and
+							horizontal components of the electric field. </span
+						>Can you explain what you see by looking at the band diagram or the
+						electric field at the two PN junctions?
+					</p>
+
+					<br /><br />
+					<!-- Vd -->
+					<input
+						class="vdSlider1"
+						type="range"
+						type="range"
+						min="0"
+						max="3"
+						value="1"
+						step="1"
+						onchange="updateVD(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="0.1"></option>
+						<option value="2" label="0.3"></option>
+						<option value="3" label="1.0"></option>
+					</datalist>
+					<label for="vdSlider1" class="labels">Vd (V)</label>
+
+					<br /><br />
+					<button
+						class="button resetButton"
+						type="button"
+						onclick="resetScene()"
+					>
+						Reset
+					</button>
+
+					<p>Graph electric field direction:</p>
+					<div class="ToggleGroup">
+						<input
+							id="toggleX1"
+							name="state-d"
+							type="radio"
+							onchange="switchGraphMode('x')"
+						/>
+						<label for="toggleX1" onclick="">X</label>
+
+						<input
+							id="toggleY1"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('z')"
+						/>
+						<label for="toggleY1" onclick="">Z</label>
+
+						<input
+							id="toggleBoth1"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('both')"
+						/>
+						<label for="toggleBoth1" onclick="">X & Z</label>
+
+						<a></a>
+					</div>
+
+					<div class="switchContainer">
+						<label class="switch">
+							<input
+								id="scaleGraphToggle1"
+								type="checkbox"
+								onchange="toggleScaleGraph()"
+							/>
+							<span class="handle"></span>
+						</label>
+						<span>Scale graph to highest peak in electric field</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="row row2" id="scene2">
+				<div class="col-lg-4">
+					<h1>Apply gate voltage</h1>
+					<p>
+						Now, let’s assume no voltage is applied to the drain and instead
+						apply a voltage to gate and see what happens. Can you explain what
+						you see based on what you learned about MOS capacitors? Can you
+						guess what is the threshold voltage of this device?
+					</p>
+					<br /><br />
+					<!-- Vg -->
+					<input
+						class="vgSlider2"
+						type="range"
+						type="range"
+						min="0"
+						max="3"
+						value="1"
+						step="1"
+						onchange="updateVG(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="0.5"></option>
+						<option value="2" label="1.0"></option>
+						<option value="3" label="1.3"></option>
+					</datalist>
+					<label for="vgSlider2" class="labels">Vg (V)</label>
+
+					<!-- <button
+						class="button chargeButton"
+						type="button"
+						onclick="applyCharge()"
+					>
+						Apply Charge to Vg
+					</button> -->
+					<br /><br />
+					<button
+						class="button resetButton"
+						type="button"
+						onclick="resetScene()"
+					>
+						Reset
+					</button>
+
+					<p>Graph electric field direction:</p>
+					<div class="ToggleGroup">
+						<input
+							id="toggleX2"
+							name="state-d"
+							type="radio"
+							onchange="switchGraphMode('x')"
+						/>
+						<label for="toggleX2" onclick="">X</label>
+
+						<input
+							id="toggleY2"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('z')"
+						/>
+						<label for="toggleY2" onclick="">Z</label>
+
+						<input
+							id="toggleBoth2"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('both')"
+						/>
+						<label for="toggleBoth2" onclick="">X & Z</label>
+
+						<a></a>
+					</div>
+
+					<div class="switchContainer">
+						<label class="switch">
+							<input
+								id="scaleGraphToggle2"
+								type="checkbox"
+								onchange="toggleScaleGraph()"
+							/>
+							<span class="handle"></span>
+						</label>
+						<span>Dynamic Scale for Electric Field</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="row row3" id="scene3">
+				<div class="col-lg-4">
+					<h1>Apply gate and drain voltages</h1>
+					<p>
+						Apply a voltage to the gate and then increase the drain voltage set
+						by step and see what happens. Do you see the saturation of the drain
+						current (pinch off)? Can you explain what happens at the pinched off
+						region?
+					</p>
+					<br /><br />
+					<!-- Vg -->
+					<input
+						class="vgSlider3"
+						type="range"
+						type="range"
+						min="0"
+						max="3"
+						value="0"
+						step="1"
+						onchange="updateVG(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="0.5"></option>
+						<option value="2" label="1.0"></option>
+						<option value="3" label="1.3"></option>
+					</datalist>
+					<label for="vgSlider3" class="labels">Vg (V)</label>
+
+					<!-- Vd -->
+					<input
+						class="vdSlider3"
+						type="range"
+						type="range"
+						min="0"
+						max="3"
+						value="0"
+						step="1"
+						onchange="updateVD(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="0.1"></option>
+						<option value="2" label="0.3"></option>
+						<option value="3" label="1.0"></option>
+					</datalist>
+					<label for="vdSlider3" class="labels">Vd (V)</label>
+					<br /><br />
+
+					<button
+						class="button resetButton"
+						type="button"
+						onclick="resetScene()"
+					>
+						Reset
+					</button>
+
+					<p>Graph electric field direction:</p>
+					<div class="ToggleGroup">
+						<input
+							id="toggleX3"
+							name="state-d"
+							type="radio"
+							onchange="switchGraphMode('x')"
+						/>
+						<label for="toggleX3" onclick="">X</label>
+
+						<input
+							id="toggleY3"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('z')"
+						/>
+						<label for="toggleY3" onclick="">Z</label>
+
+						<input
+							id="toggleBoth3"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('both')"
+						/>
+						<label for="toggleBoth3" onclick="">X & Z</label>
+
+						<a></a>
+					</div>
+
+					<div class="switchContainer">
+						<label class="switch">
+							<input
+								id="scaleGraphToggle3"
+								type="checkbox"
+								onchange="toggleScaleGraph()"
+							/>
+							<span class="handle"></span>
+						</label>
+						<span>Dynamic Scale for Electric Field</span>
+					</div>
+				</div>
+			</div>
+			<div id="visualization"></div>
+		</div>
+	</body>
+</html>

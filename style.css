@@ -1,0 +1,508 @@
+@font-face {
+	font-family: "Agency FB";
+	src: local("./Agency_FB.ttf");
+}
+
+@font-face {
+	font-family: "Agency FB";
+	src: url("./Agency_FB.ttf");
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+
+:root {
+	--brand: #fff7ae;
+	--bgGrey: #575757;
+}
+
+#body_parent {
+	background-color: #121212;
+	padding-bottom: 50px;
+	margin: auto;
+}
+
+.container {
+	max-width: 90% !important;
+}
+
+.col-lg-4 {
+	max-width: 28% !important;
+}
+
+.title {
+	margin-top: 200px;
+	margin-left: 10% !important;
+	margin-right: 10% !important;
+}
+
+.title h1 {
+	font-family: Agency FB;
+	font-style: normal;
+	font-weight: bold;
+	letter-spacing: 2px;
+	font-size: 48px;
+	line-height: 96px;
+
+	/* identical to box height */
+
+	text-align: center;
+
+	color: #fff7ae;
+}
+
+.title p {
+	margin-top: 30px;
+	font-family: Bai Jamjuree;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 20px;
+	line-height: 30px;
+
+	color: #ffffff;
+
+	text-align: center;
+}
+
+.row1,
+.row2,
+.row3,
+.row4,
+.row5,
+.row6,
+.row7,
+.row8,
+.row9,
+.row10,
+.row11,
+.row12 {
+	margin-top: 200px;
+	opacity: 0;
+	transform: translateY(50px);
+	transition: all 0.3s ease-out;
+}
+
+.row11 {
+	margin-bottom: 300px;
+}
+
+.row1 h1,
+.row2 h1,
+.row3 h1,
+.row4 h1,
+.row5 h1,
+.row6 h1,
+.row7 h1,
+.row8 h1,
+.row9 h1,
+.row10 h1,
+.row11 h1,
+.row12 h1 {
+	font-family: Agency FB;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 36px;
+	line-height: 72px;
+	color: #fff7ae;
+}
+
+.button {
+	background-color: var(--brand);
+	border: none;
+	border-radius: 8px;
+	color: black;
+	padding: 12px 16px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+}
+
+.button.disabled {
+	background-color: grey;
+}
+
+.highlight {
+	color: #fff7ae;
+	font-weight: 500;
+}
+
+.row1 p,
+.row2 p,
+.row3 p,
+.row4 p,
+.row5 p,
+.row6 p,
+.row7 p,
+.row8 p,
+.row9 p,
+.row10 p,
+.row11 p,
+.row12 p {
+	margin-top: 30px;
+	font-family: Bai Jamjuree;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 16px;
+	line-height: 27px;
+
+	color: #ffffff;
+}
+
+.fade-in {
+	opacity: 1 !important;
+	transform: translateY(0px) !important;
+}
+
+#visualization {
+	position: fixed;
+	top: 0px;
+	right: 0px;
+	z-index: -100;
+	margin: 30px;
+	margin-right: 50px;
+}
+
+.axis line {
+	stroke: #fff;
+}
+
+.axis path {
+	fill: none;
+	stroke: #fff;
+}
+
+.label {
+	fill: #fff;
+}
+
+#d3-viz {
+	/* background-color: white; */
+	min-height: 400px;
+	opacity: 0;
+	transform: translateY(50px);
+	transition: all 0.3s ease-out;
+}
+
+.noselect {
+	-webkit-touch-callout: none;
+	/* iOS Safari */
+	-webkit-user-select: none;
+	/* Safari */
+	-khtml-user-select: none;
+	/* Konqueror HTML */
+	-moz-user-select: none;
+	/* Old versions of Firefox */
+	-ms-user-select: none;
+	/* Internet Explorer/Edge */
+	user-select: none;
+	/* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.cursor-grab {
+	cursor: -webkit-grab;
+	cursor: grab;
+}
+
+.cursor-point {
+	cursor: pointer;
+}
+
+#back-icon {
+	width: 36px;
+	height: 36px;
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	cursor: pointer;
+}
+
+.labels {
+	display: block;
+	color: white;
+}
+
+.browser-spec {
+	padding: 16px;
+	border-left: 5px solid #fef6b6;
+	background: #323332;
+	border-radius: 8px;
+}
+
+.controls {
+	width: 190px;
+	margin-top: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.controls .button {
+	font-size: 16px;
+	padding: 4;
+	color: white;
+	background-color: black;
+	border: 1px solid white;
+	border-radius: 8px;
+}
+
+/* Range slider */
+
+.sliderContainer {
+	margin-top: 32px;
+	margin-bottom: 32px;
+}
+
+.sliderLabel {
+	color: white;
+}
+
+input[type="range"] {
+	-webkit-appearance: none;
+	width: 240px;
+	height: 6px;
+	background: var(--bgGrey);
+	border-radius: 5px;
+	outline: none;
+	transition: background 0.3s;
+	position: relative;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+	width: 240px;
+	height: 6px;
+	border-radius: 5px;
+	background: var(--bgGrey);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	background: var(--brand);
+	border-radius: 50%;
+	cursor: pointer;
+	position: relative;
+	box-shadow: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	background: var(--brand);
+	border-radius: 50%;
+	cursor: pointer;
+	box-shadow: none;
+}
+
+input[type="range"]::-moz-range-progress {
+	background: var(--brand);
+	height: 6px;
+	border-radius: 5px;
+}
+
+input[type="range"]::-ms-fill-lower {
+	background: var(--brand);
+	border-radius: 5px;
+}
+
+/* slider disabled */
+input[type="range"] {
+	-webkit-appearance: none;
+	width: 240px;
+	height: 6px;
+	background: var(--bgGrey);
+	border-radius: 5px;
+	outline: none;
+	transition: background 0.3s;
+	position: relative;
+}
+
+input[type="range"]:disabled::-webkit-slider-runnable-track {
+	width: 240px;
+	height: 6px;
+	border-radius: 5px;
+	background: var(--bgGrey);
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	background: var(--bgGrey);
+	border-radius: 50%;
+	cursor: pointer;
+	position: relative;
+	box-shadow: none;
+}
+
+input[type="range"]:disabled::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	background: var(--bgGrey);
+	border-radius: 50%;
+	cursor: pointer;
+	box-shadow: none;
+}
+
+input[type="range"]:disabled::-moz-range-progress {
+	background: var(--bgGrey);
+	height: 6px;
+	border-radius: 5px;
+}
+
+input[type="range"]:disabled::-ms-fill-lower {
+	background: var(--bgGrey);
+	border-radius: 5px;
+}
+
+datalist {
+	display: flex;
+	justify-content: space-between;
+	color: white;
+	width: 240px;
+}
+
+datalist option {
+	font-size: 0.8rem;
+}
+
+/* Back button */
+.backButton {
+	background-color: #191919;
+	border: 2px solid var(--brand);
+	border-radius: 8px;
+	color: var(--brand);
+	padding: 12px 16px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+}
+
+.backButton a {
+	color: var(--brand);
+	text-decoration: none;
+}
+
+.backButton a:hover {
+	color: var(--brand);
+	text-decoration: none;
+}
+
+/* ToggleGroup */
+.ToggleGroup {
+	display: flex;
+	position: relative;
+	background: var(--bgGrey);
+	border-radius: 24px;
+	padding: 5px;
+	width: 200px;
+	justify-content: space-between;
+	margin-top: 16px;
+	margin-bottom: 32px;
+}
+
+.ToggleGroup input {
+	display: none;
+}
+
+.ToggleGroup label {
+	color: white;
+	flex: 1;
+	text-align: center;
+	padding: 8px;
+	border-radius: 20px;
+	cursor: pointer;
+	transition: background 0.3s, color 0.3s;
+}
+
+.ToggleGroup input:checked + label {
+	background: var(--brand);
+	color: black;
+	font-weight: bold;
+}
+
+.ToggleGroup a {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 0;
+}
+
+/* ToggleGroup override bootstrap */
+label {
+	display: inline-block;
+	margin-bottom: 0 !important;
+}
+
+/* Switch Component */
+.switch {
+	position: relative;
+	display: inline-block;
+	min-width: 50px;
+	height: 24px;
+}
+
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.handle {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--bgGrey);
+	transition: 0.4s;
+	border-radius: 34px;
+}
+
+.handle:before {
+	position: absolute;
+	content: "";
+	height: 18px;
+	width: 18px;
+	left: 3px;
+	bottom: 3px;
+	background-color: #cccccc;
+	transition: 0.4s;
+	border-radius: 50%;
+}
+
+/* background when enabled */
+input:checked + .handle {
+	background-color: var(--brand);
+}
+
+/* handle when enabled */
+input:checked + .handle:before {
+	transform: translateX(26px);
+	background-color: #756800;
+}
+
+.switchContainer {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.switchContainer span {
+	color: #ffffff;
+	font-family: Bai Jamjuree;
+}
+
+/* override bootstrap code that adds margin to the switch body and makes labels misaligned */
+label {
+	display: inline-block;
+	margin-bottom: 0 !important;
+}
