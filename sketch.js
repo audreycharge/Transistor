@@ -1,6 +1,7 @@
 /* ------------------------------- 
 Authors: Ren Zheng, Azad Naeemi
 Contact: renzheng112@gmail.com
+Modified by: Audrey Chung
 ------------------------------- */
 
 // Tools ============================================================
@@ -307,12 +308,12 @@ function draw() {
 
 		if (sceneCount > 0) {
 			drawBase();
-			drawParameters();
+			// drawParameters();
 			drawVDExplain();
 			updateCharges();
-			drawWires();
+			// drawWires();
 			drawBandDiagram();
-			drawGraph();
+			// drawGraph();
 			updateWireElectrons();
 			drawMetalCharges();
 			stabilizeChargeCount();
@@ -374,7 +375,8 @@ function stabilizeChargeCount() {
 	// if it dips below the initial count, reinsert more from the metal above
 	if (numElectronsInSource < initElectronCount) {
 		var newCharge = new Charge(
-			random(base.x, base.sourceEndX),
+			// random(base.x, base.sourceEndX),
+			random(base.x, base.x),
 			base.y,
 			"e",
 			chargeID,
@@ -529,18 +531,18 @@ function initCharges() {
 	let buffer = 12; // draw inside box borders
 
 	// initialize fixed positive charges in source
-	for (let i = 0; i < fixedPosCharges; i++) {
-		let x = random(base.x + buffer, base.sourceEndX - buffer);
-		let y = random(base.y + buffer, base.sourceEndY - buffer);
-		fixedCharges.push(new Charge(x, y, "fp", chargeID));
-	}
+	// for (let i = 0; i < fixedPosCharges; i++) {
+	// 	let x = random(base.x + buffer, base.sourceEndX - buffer);
+	// 	let y = random(base.y + buffer, base.sourceEndY - buffer);
+	// 	fixedCharges.push(new Charge(x, y, "fp", chargeID));
+	// }
 
 	// initialize fixed positive charges in source
-	for (let i = 0; i < fixedPosCharges; i++) {
-		let x = random(base.drainX + buffer, base.drainEndX - buffer);
-		let y = random(base.y + buffer, base.drainEndY - buffer);
-		fixedCharges.push(new Charge(x, y, "fp", chargeID));
-	}
+	// for (let i = 0; i < fixedPosCharges; i++) {
+	// 	let x = random(base.drainX + buffer, base.drainEndX - buffer);
+	// 	let y = random(base.y + buffer, base.drainEndY - buffer);
+	// 	fixedCharges.push(new Charge(x, y, "fp", chargeID));
+	// }
 
 	// initialize fixed negative charges in substrate
 	for (let i = 0; i < fixedNegCharges; i++) {
@@ -548,8 +550,9 @@ function initCharges() {
 		let y = 0;
 		// regenerate position if in source OR drain
 		while (
-			(x < base.sourceEndX + buffer && y < base.sourceEndY) ||
-			(x > base.drainX - buffer && y < base.sourceEndY)
+			//extend boundary to whole box
+			(x < base.x + buffer && y < base.sourceEndY) ||
+			(x > base.drainEndX - buffer && y < base.sourceEndY)
 		) {
 			x = random(base.x + buffer, base.endX);
 			y = random(base.y + buffer, base.y + base.height);
@@ -563,8 +566,8 @@ function initCharges() {
 		let y = 0;
 		// regenerate position if in source OR drain
 		while (
-			(x < base.sourceEndX + buffer && y < base.sourceEndY) ||
-			(x > base.drainX - buffer && y < base.sourceEndY)
+			(x < base.x + buffer && y < base.sourceEndY) ||
+			(x > base.drainEndX - buffer && y < base.sourceEndY)
 		) {
 			x = random(base.x + buffer, base.endX);
 			y = random(base.y + buffer, base.y + base.height);
@@ -1116,14 +1119,14 @@ function updateCharges() {
 	}
 
 	// Display electrons
-	for (let i = 0; i < electrons.length; i++) {
-		electrons[i].draw();
-		electrons[i].updateOpacity();
+	// for (let i = 0; i < electrons.length; i++) {
+	// 	electrons[i].draw();
+	// 	electrons[i].updateOpacity();
 
-		if (electrons[i].appear > 20) {
-			electrons[i].update();
-		}
-	}
+	// 	if (electrons[i].appear > 20) {
+	// 		electrons[i].update();
+	// 	}
+	// }
 
 	// Display holes
 	for (let i = 0; i < holes.length; i++) {
@@ -1136,9 +1139,9 @@ function updateCharges() {
 	}
 
 	// Check for recombination
-	if (recomOn) {
-		recom(electrons, holes);
-	}
+	// if (recomOn) {
+	// 	recom(electrons, holes);
+	// }
 
 	// Show generation effects
 	for (let i = 0; i < generationEffects.length; i++) {
@@ -1207,52 +1210,52 @@ function drawBase() {
 	canvas.drawingContext.setLineDash([]);
 
 	// source
-	rect(base.x, base.y, base.sourceWidth, base.sourceHeight, base.smallRadius);
+	// rect(base.x, base.y, base.sourceWidth, base.sourceHeight, base.smallRadius);
 
 	// drain
-	rect(
-		base.x + base.width - base.sourceWidth,
-		base.y,
-		base.sourceWidth,
-		base.sourceHeight,
-		base.smallRadius
-	);
+	// rect(
+	// 	base.x + base.width - base.sourceWidth,
+	// 	base.y,
+	// 	base.sourceWidth,
+	// 	base.sourceHeight,
+	// 	base.smallRadius
+	// );
 
 	// oxide
-	rect(
-		base.metalX,
-		base.y - base.metalHeight,
-		base.metalWidth,
-		base.metalHeight,
-		base.smallRadius
-	);
+	// rect(
+	// 	base.metalX,
+	// 	base.y - base.metalHeight,
+	// 	base.metalWidth,
+	// 	base.metalHeight,
+	// 	base.smallRadius
+	// );
 
 	// gate metal
-	rect(
-		base.metalX,
-		base.y - base.metalHeight * 2,
-		base.metalWidth,
-		base.metalHeight,
-		base.smallRadius
-	);
+	// rect(
+	// 	base.metalX,
+	// 	base.y - base.metalHeight * 2,
+	// 	base.metalWidth,
+	// 	base.metalHeight,
+	// 	base.smallRadius
+	// );
 
 	// metal above source
-	rect(
-		base.x,
-		base.y - base.metalHeight,
-		base.sourceWidth,
-		base.metalHeight,
-		base.smallRadius
-	);
+	// rect(
+	// 	base.x,
+	// 	base.y - base.metalHeight,
+	// 	base.sourceWidth,
+	// 	base.metalHeight,
+	// 	base.smallRadius
+	// );
 
 	// metal above drain
-	rect(
-		base.drainX,
-		base.y - base.metalHeight,
-		base.sourceWidth,
-		base.metalHeight,
-		base.smallRadius
-	);
+	// rect(
+	// 	base.drainX,
+	// 	base.y - base.metalHeight,
+	// 	base.sourceWidth,
+	// 	base.metalHeight,
+	// 	base.smallRadius
+	// );
 
 	noFill();
 
@@ -1261,31 +1264,31 @@ function drawBase() {
 
 	// bottom metal
 	noFill();
-	rect(
-		base.x,
-		base.y + base.height,
-		base.width,
-		base.bottomMetalHeight,
-		base.largeRadius
-	);
+	// rect(
+	// 	base.x,
+	// 	base.y + base.height,
+	// 	base.width,
+	// 	base.bottomMetalHeight,
+	// 	base.largeRadius
+	// );
 
 	// bottom ground
-	image(
-		groundImg,
-		base.midX - 14,
-		base.endY + base.bottomMetalHeight,
-		groundImg.width / 1.2,
-		groundImg.height / 1.2
-	);
+	// image(
+	// 	groundImg,
+	// 	base.midX - 14,
+	// 	base.endY + base.bottomMetalHeight,
+	// 	groundImg.width / 1.2,
+	// 	groundImg.height / 1.2
+	// );
 
 	// left ground
-	image(
-		leftGroundImg,
-		base.leftGroundX + 10,
-		base.vgY - 15.5,
-		leftGroundImg.width,
-		leftGroundImg.height
-	);
+	// image(
+	// 	leftGroundImg,
+	// 	base.leftGroundX + 10,
+	// 	base.vgY - 15.5,
+	// 	leftGroundImg.width,
+	// 	leftGroundImg.height
+	// );
 
 	// drain current label + number
 	styleText();
@@ -1303,33 +1306,33 @@ function drawBase() {
 	styleText();
 	textAlign(CENTER);
 	text("Substrate", base.midX, base.y + base.height / 2);
-	text("Source", base.x + base.sourceWidth / 2, base.y + base.sourceHeight / 2);
+	// text("Source", base.x + base.sourceWidth / 2, base.y + base.sourceHeight / 2);
 
-	// source metal
-	text("Metal", base.x + base.sourceWidth / 2, base.oxideLabelY);
+	// // source metal
+	// text("Metal", base.x + base.sourceWidth / 2, base.oxideLabelY);
 
-	// drain metal
-	text("Metal", base.drainX + base.sourceWidth / 2, base.oxideLabelY);
+	// // drain metal
+	// text("Metal", base.drainX + base.sourceWidth / 2, base.oxideLabelY);
 
-	// drain
-	text(
-		"Drain",
-		base.drainX + base.sourceWidth / 2,
-		base.y + base.sourceHeight / 2
-	);
+	// // drain
+	// text(
+	// 	"Drain",
+	// 	base.drainX + base.sourceWidth / 2,
+	// 	base.y + base.sourceHeight / 2
+	// );
 
-	// top metal
-	text("Metal", base.midX, base.y - base.metalHeight * 1.35);
+	// // top metal
+	// text("Metal", base.midX, base.y - base.metalHeight * 1.35);
 
-	// oxide
-	text("Oxide", base.midX, base.oxideLabelY);
+	// // oxide
+	// text("Oxide", base.midX, base.oxideLabelY);
 
-	// bottom metal
-	text(
-		"Metal",
-		base.midX,
-		base.y + base.height + base.bottomMetalHeight / 2 + 8
-	);
+	// // bottom metal
+	// text(
+	// 	"Metal",
+	// 	base.midX,
+	// 	base.y + base.height + base.bottomMetalHeight / 2 + 8
+	// );
 }
 
 function drawWires() {
