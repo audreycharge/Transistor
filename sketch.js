@@ -187,6 +187,12 @@ let vdOn; // drain on/off
 let vgCharge; // actual vg charge amount in V
 let vdCharge; // actual vd charge amount in mA
 
+let dopants = 0; // value controlling the gradient of fixed charges distribution
+let dopantBuckets = []; // array to store number of fixed negative charges per column
+let holeBuckets = []; // aray to store number of holes per column;
+let chargeBuckets = []; // array to store resultant charge per column;
+let electricFIeldBuckets = []; // array to store electric field per column
+
 let dis1 = base.wire.leftMetal.y - base.wire.vdLeft.y; // vg left wire length
 let dis2 = base.wire.vdRight.x - base.wire.vdLeft.x; // vg middle wire length
 let dis3 = base.wire.rightMetal.y - base.wire.vdRight.y; // vg right wire length
@@ -477,11 +483,17 @@ function resetScene() {
 		if (vdSlider) {
 			vdSlider.value = 0;
 		}
-		let vgSlider = document.querySelector(`.vgSlider${sceneCount}`);
 
+		let vgSlider = document.querySelector(`.vgSlider${sceneCount}`);
 		if (vgSlider) {
 			vgSlider.value = 0;
 		}
+
+		// let dopeSlider = document.querySelector(`.dopeSlider${sceneCount}`);
+		// if (dopeSlider) {
+		// 	dopeSlider.value = 0;
+		// }
+
 		toggleVGSlider("on");
 	}
 
@@ -526,7 +538,7 @@ function initCharges() {
 	// Function: Initialize charges at beginning of scene
 
 	// Fixed charges halved only for visual purposes and keep less crowded (in reality they are the same amount), visually you can't tell if they match in number
-	let fixedNegCharges = initHoleCount / 2;
+	let fixedNegCharges = initHoleCount;
 	let fixedPosCharges = initElectronCount / 2;
 	let buffer = 12; // draw inside box borders
 
@@ -545,39 +557,92 @@ function initCharges() {
 	// }
 
 	// initialize fixed negative charges in substrate
-	for (let i = 0; i < fixedNegCharges; i++) {
-		let x = 0;
-		let y = 0;
-		// regenerate position if in source OR drain
-		while (
-			//extend boundary to whole box
-			(x < base.x + buffer && y < base.sourceEndY) ||
-			(x > base.drainEndX - buffer && y < base.sourceEndY)
-		) {
-			x = random(base.x + buffer, base.endX);
-			y = random(base.y + buffer, base.y + base.height);
-		}
-		fixedCharges.push(new Charge(x, y, "fn", chargeID));
+	let sections = 5;
+	let dotCount = []
+	// let d = 16; //0-16
+	let sec = base.width/sections;
+	let a1 = (fixedNegCharges*2/sections - (sections - 1)*dopants)/2;
+	// let an = a1 + (sections-1)*d;
+	dotCount.push(a1);
+
+	for (let n = 1; n < sections; n++) {
+		an = a1 + n*dopants
+		dotCount.push(an);
 	}
 
-	// initialize holes in substrate
-	for (let i = 0; i < initHoleCount; i++) {
-		let x = 0;
-		let y = 0;
-		// regenerate position if in source OR drain
-		while (
-			(x < base.x + buffer && y < base.sourceEndY) ||
-			(x > base.drainEndX - buffer && y < base.sourceEndY)
-		) {
-			x = random(base.x + buffer, base.endX);
-			y = random(base.y + buffer, base.y + base.height);
+	for (let i = 0; i < sections;i++) {
+		for (let fn = 0; fn < dotCount[i]; fn++) {
+			let x = 0;
+			let y = 0;
+			x = random(sec*i + base.x + buffer, sec*(i+1)+ base.x - buffer)
+			y = random(base.y + buffer, base.y + base.height)
+			fixedCharges.push(new Charge(x, y, "fn", chargeID));
+			
+			let newCharge = new Charge(x, y, "h", chargeID, "i");
+			newCharge.botz =
+				botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
+			holes.push(newCharge);
+			chargeID++;
 		}
-		let newCharge = new Charge(x, y, "h", chargeID, "i");
-		newCharge.botz =
-			botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
-		holes.push(newCharge);
-		chargeID++;
 	}
+
+	let tempholes = holes.slice();
+	let bucketwidth = base.width/20;
+	dopantBuckets = [];
+
+	for (let b = 0; b < 20; b++) {
+		dopantBuckets.push(0);
+		let bucketX = base.x + bucketwidth*(b+1)
+		for (let h = 0; h < tempholes.length;h++) {
+			if (tempholes[h].x < bucketX) {
+				dopantBuckets[b]++;
+				tempholes.splice(h,1);
+				h--;
+			}
+		}
+	}
+	// print(dopantBuckets)
+
+
+	// for (let i = 0; i < recomEffects.length; i++) {
+	// 	if (recomEffects[i].opacity < 1) {
+	// 		recomEffects.splice(i, 1);
+	// 	}
+	// }
+
+	// for (let i = 0; i < fixedNegCharges; i++) {
+	// 	let x = 0;
+	// 	let y = 0;
+	// 	// regenerate position if in source OR drain
+	// 	while (
+	// 		//extend boundary to whole box
+	// 		(x < base.x + buffer && y < base.sourceEndY) ||
+	// 		(x > base.drainEndX - buffer && y < base.sourceEndY)
+	// 	) {
+	// 		x = random(base.x + buffer, base.endX);
+	// 		y = random(base.y + buffer, base.y + base.height);
+	// 	}
+	// 	fixedCharges.push(new Charge(x, y, "fn", chargeID));
+	// }
+
+	// initialize holes in substrate
+	// for (let i = 0; i < initHoleCount; i++) {
+	// 	let x = 0;
+	// 	let y = 0;
+	// 	// regenerate position if in source OR drain
+	// 	while (
+	// 		(x < base.x + buffer && y < base.sourceEndY) ||
+	// 		(x > base.drainEndX - buffer && y < base.sourceEndY)
+	// 	) {
+	// 		x = random(base.x + buffer, base.endX);
+	// 		y = random(base.y + buffer, base.y + base.height);
+	// 	}
+	// 	let newCharge = new Charge(x, y, "h", chargeID, "i");
+	// 	newCharge.botz =
+	// 		botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
+	// 	holes.push(newCharge);
+	// 	chargeID++;
+	// }
 
 	// initialize electrons
 	for (let i = 0; i < initElectronCount; i++) {
@@ -616,11 +681,11 @@ function setIntervals() {
 	});
 
 	// set generation interval
-	intervals.push(
-		setInterval(function () {
-			generateCharges(1);
-		}, intervalRate)
-	);
+	// intervals.push(
+	// 	setInterval(function () {
+	// 		generateCharges(1);
+	// 	}, intervalRate)
+	// );
 
 	// set recombination interval
 	intervals.push(
@@ -993,6 +1058,16 @@ function updateVD(value) {
 	updateDrainCurrent();
 }
 
+function updateDopants(value) {
+	// Function: handles doping slider change
+	//higher the slide, the larger the gradient
+	// print(value)
+	let valuetoDopeMap = [0, 4, 8, 12, 16];
+	dopants = valuetoDopeMap[value];
+	resetScene()
+
+}
+
 function updateDrainCurrent() {
 	if (vgCharge == 0 || vgCharge == 0.5 || vdCharge == 0) {
 		drainCurrent = 0;
@@ -1128,6 +1203,11 @@ function updateCharges() {
 	// 	}
 	// }
 
+	//reset holeBuckets array
+	for (let i = 0; i < 20; i++) {
+		holeBuckets[i] = 0;
+	}
+
 	// Display holes
 	for (let i = 0; i < holes.length; i++) {
 		holes[i].draw();
@@ -1136,7 +1216,35 @@ function updateCharges() {
 		if (holes[i].appear > 20) {
 			holes[i].update();
 		}
+
+		let bucketwidth = base.width/20;
+		let bucketID = Math.floor((holes[i].x - base.x)/bucketwidth);
+		holeBuckets[bucketID]++;
 	}
+
+	//update chargeBuckets
+	// for (let i = 0; i < 20; i++) {
+	// 	chargeBuckets[i] = holeBuckets[i] - dopantBuckets[i];
+	// }
+
+	//update electricFieldBuckets
+	let chargeTotal = 0;
+	for (let i = 0; i < 20; i++) {
+		let chargeBucket = holeBuckets[i] - dopantBuckets[i];
+		chargeTotal += chargeBucket;
+		electricFIeldBuckets[i] = chargeTotal;
+	}
+
+	let testp = 0;
+	let testp2 = 0;
+	for (let i = 0; i < 20;i++) {
+		testp += electricFIeldBuckets[i];
+		testp2 += holeBuckets[i];
+	}
+	print(testp)
+	// print(testp2)
+
+	// print(electricFIeldBuckets);
 
 	// Check for recombination
 	// if (recomOn) {

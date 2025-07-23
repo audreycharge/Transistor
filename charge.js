@@ -351,161 +351,28 @@ class Charge {
 	accelerate() {
 		// Read electric field data from Voltage Profiles files ==============================================================
 		let Ex;
-		let Ez;
+		let Ez; //Ez is the electric field in the vertical direction and here it will be zero. I Keep it if we need it in the future.  
 
 		let x = this.x - base.x;
 		let y = this.y - base.y;
 
-		if (x < 640 && x > 0 && y < 320 && y > 0) {
+		if (x < base.width && x > 0 && y < base.height && y > 0) {
 			// width of transistor = 640, height = 320 
-			let row = Math.floor(y / 10 * 2.25); // data is split up into 72 rows
-			let col = Math.floor(x / 10); // data is split up into 64 columns
+			
+			let col = Math.floor(x / 20); // Assuming we have obtained electric field in 20 regions
 
 			// Assign Ex and Ez to data
-			Ez = efGrid[row][col].efz / 2;
-			if (Ez < 6000) {
-				Ez = 0;
-			} else {
-				Ez = Ez / 100000;
-			}
+			Ez = 0
 
-			Ex = efGrid[row][col].efx;
-
-			// Manual editing to get desired charge behavior
-			if (Ex < 3000 && Ex > -3000) {
-				Ex = 0;
-			} else {
-				Ex = Ex / 100000;
-			}
-
-			if (row < 5 * 2.25) {
-				Ex = efGrid[0][col].efx;
-				Ex = Ex / 100000;
-			}
-			if (vgCharge == 1.3) {
-				if (vdCharge == 0) {
-					if (col > 8 && col < 32 && row < 3 * 2.25) {
-						Ex = -0.01;
-					}
-					if (col > 33 && col < 57 && row < 3 * 2.25 ) {
-						Ex = 0.01;
-					}
-				}
-
-				if (vdCharge == 0.1) {
-					if (Ex > 0 && row < 2 * 2.25) {
-						Ex = -Ex;
-					}
-					if (row < 2 * 2.25) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 2 * 2.25) {
-						Ex = -0.1;
-					}
-				}
-
-				if (vdCharge == 0.3) {
-					if (Ex > 0 && row < 3 * 2.25) {
-						Ex = -Ex;
-					}
-					if (row < 3 * 2.25) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 5 * 2.25) {
-						Ex = -0.1;
-					}
-				}
-
-				if (vdCharge == 1) {
-					if (Ex > 0 && row < 3 * 2.25) {
-						Ex = -Ex;
-					}
-					if (row < 3 * 2.25) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 5 * 2.25) {
-						Ex = -0.1;
-					}
-					if (
-						this.type == "h" &&
-						col < 49 - 0.3 * row / 2.25 &&
-						col > 46 - 0.3 * row / 2.25
-					) { //Pinch off, move holes near the end of the channel
-						Ex = 0.5; 
- 						Ez = -0.5;
-					}
-				}
-			}
-			if (vgCharge == 1) {
-				if (vdCharge == 0) {
-					if (col > 8 && col < 32 && row < 2 * 2.25) {
-						Ex = -0.01;
-					}
-					if (col > 33 && col < 57 && row < 2 * 2.25) {
-						Ex = 0.01;
-					}
-				}
-
-				if (vdCharge == 0.1) {
-					if (Ex > 0 && row < 2 * 2.25) {
-						Ex = -Ex;
-					}
-					if (row < 2 * 2.25) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 2 * 2.25) {
-						Ex = -0.1;
-					}
-				}
-
-				if (vdCharge == 0.3) {
-					if (Ex > 0 && row < 2 * 2.25) {
-						Ex = -Ex;
-					}
-					if (row < 2 * 2.25) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 2 * 2.25) {
-						Ex = -0.1;
-					}
-					if (
-						this.type == "h" &&
-						col < 49 - 0.3 * row / 2.25 &&
-						col > 47 - 0.3 * row / 2.25
-					) { //Pinch off, move holes near the end of the channel
-						Ex = 0.5;
-						Ez = -0.5;
-					}
-				}
-
-				if (vdCharge == 1) {
-					if (Ex > 0 && row < 3 * 2.25) {
-						Ex = -Ex;
-					}
-					if (row < 3 * 2.25) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 5 * 2.25) {
-						Ex = -0.1;
-					}
-					if (
-						this.type == "h" &&
-						col < 49 - 0.3 * row / 2.25 &&
-						col > 43 - 0.3 * row / 2.25
-					) {//Pinch off, move holes near the end of the channel
-						Ex = 0.5;
-						Ez = -0.4;
-						if (row< 5 * 2.25){Ez = 0} //stop holes from going into the gate insulator
-					}
-				}
-			}
+			Ex = electricFIeldBuckets[col]; //This is the calculated electric field
+			
 		} else {
 			Ex = 0;
 			Ez = 0;
 		}
 
 		// Multpliy the electric field by a constant to convert it to accelration on screen. Find best value with trial and error.
-		let accelFactor = 5;
+		let accelFactor = 0.5;
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ez * accelFactor;
 
@@ -516,8 +383,8 @@ class Charge {
 		}
 
 		if (this.type == "h") {
-			// if an electron, accel in in the opposite direction of the electric field
-			this.accel.x = this.accel.x / 10;
+			// if a hole, accel in in the direction of the electric field
+			this.accel.x = this.accel.x;
 			this.accel.y = this.accel.y;
 		}
 

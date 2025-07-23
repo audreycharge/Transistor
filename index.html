@@ -156,6 +156,24 @@
 					</datalist>
 					<label for="vdSlider1" class="labels">Vd (V)</label>
 
+					<!-- test doping slider -->
+					<input
+						class="dopeSlider1"
+						type="range"
+						min="0"
+						max="4"
+						value="1"
+						step="1"
+						onchange="updateDopants(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="2" label="0.5"></option>
+						<option value="4" label="1.0"></option>
+					</datalist>
+					<label for="dopeSlider1" class="labels">Doping</label>
+
 					<br /><br />
 					<button
 						class="button resetButton"
@@ -239,6 +257,24 @@
 						<option value="3" label="1.3"></option>
 					</datalist>
 					<label for="vgSlider2" class="labels">Vg (V)</label>
+
+					<!-- test doping slider -->
+					<input
+						class="dopeSlider2"
+						type="range"
+						min="0"
+						max="4"
+						value="1"
+						step="1"
+						onchange="updateDopants(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="2" label="0.5"></option>
+						<option value="4" label="1.0"></option>
+					</datalist>
+					<label for="dopeSlider2" class="labels">Doping</label>
 
 					<!-- <button
 						class="button chargeButton"
@@ -350,7 +386,24 @@
 						<option value="3" label="1.0"></option>
 					</datalist>
 					<label for="vdSlider3" class="labels">Vd (V)</label>
-					<br /><br />
+
+					<!-- test doping slider -->
+					<input
+						class="dopeSlider3"
+						type="range"
+						min="0"
+						max="4"
+						value="1"
+						step="1"
+						onchange="updateDopants(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="2" label="0.5"></option>
+						<option value="4" label="1.0"></option>
+					</datalist>
+					<label for="dopeSlider3" class="labels">Doping</label>
 
 					<button
 						class="button resetButton"
