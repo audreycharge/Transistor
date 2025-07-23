@@ -365,8 +365,9 @@ class Charge {
 
 		if (x < base.width && x > 0 && y < base.height && y > 0) {
 			// width of transistor = 640, height = 320 
-			
-			let col = Math.floor(x / 20); // Assuming we have obtained electric field in 20 regions
+			let width = base.width/20
+			let col = Math.floor(x / width); // Assuming we have obtained electric field in 20 regions
+			print(col)
 
 			// Assign Ex and Ez to data
 			Ez = 0

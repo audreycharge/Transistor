@@ -1234,7 +1234,7 @@ function updateCharges() {
 		chargeTotal += chargeBucket;
 		electricFIeldBuckets[i] = chargeTotal;
 	}
-	print(electricFIeldBuckets)
+	// print(electricFIeldBuckets)
 
 	// Check for recombination
 	// if (recomOn) {
