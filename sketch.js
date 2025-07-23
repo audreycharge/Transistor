@@ -1234,17 +1234,7 @@ function updateCharges() {
 		chargeTotal += chargeBucket;
 		electricFIeldBuckets[i] = chargeTotal;
 	}
-
-	let testp = 0;
-	let testp2 = 0;
-	for (let i = 0; i < 20;i++) {
-		testp += electricFIeldBuckets[i];
-		testp2 += holeBuckets[i];
-	}
-	print(testp)
-	// print(testp2)
-
-	// print(electricFIeldBuckets);
+	print(electricFIeldBuckets)
 
 	// Check for recombination
 	// if (recomOn) {

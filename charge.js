@@ -250,6 +250,13 @@ class Charge {
 			this.position.x -= 8;
 		}
 
+		if (this.position.y + this.diameter > base.endY - buffer) {
+			// bounce off bottom
+			this.velocity.y = -this.velocity.y;
+			this.position.y -= 8;
+		}
+
+
 		if (this.position.y - this.diameter < base.y + buffer) {
 			// if outside of drain
 			if (this.position.x < base.drainX) {
@@ -308,29 +315,29 @@ class Charge {
 		}
 
 		// Bounce off bottom
-		if (this.position.y > base.endY) {
-			this.direction.y = 10;
-			this.show = 0;
+		// if (this.position.y > base.endY) {
+		// 	this.direction.y = 10;
+		// 	this.show = 0;
 
-			// if holes leave the bottom into the metal, bring some back to keep the number of holes consistent (create new charges that represent existing charges coming from metal)
-			if (this.type == "h" && !this.chargeCreated) {
-				// holes
-				var newCharge = new Charge(
-					random(base.x, base.endX),
-					base.endY,
-					"h",
-					chargeID,
-					"g"
-				);
-				newCharge.direction = createVector(random(-1, 1), -1);
-				newCharge.movingVelocity = this.movingVelocity;
-				newCharge.velocity = createVector(0, -10);
-				newCharge.botz = this.botz;
-				this.chargeCreated = true;
-				chargeID++;
-				holes.push(newCharge);
-			}
-		}
+		// 	// if holes leave the bottom into the metal, bring some back to keep the number of holes consistent (create new charges that represent existing charges coming from metal)
+		// 	if (this.type == "h" && !this.chargeCreated) {
+		// 		// holes
+		// 		var newCharge = new Charge(
+		// 			random(base.x, base.endX),
+		// 			base.endY,
+		// 			"h",
+		// 			chargeID,
+		// 			"g"
+		// 		);
+		// 		newCharge.direction = createVector(random(-1, 1), -1);
+		// 		newCharge.movingVelocity = this.movingVelocity;
+		// 		newCharge.velocity = createVector(0, -10);
+		// 		newCharge.botz = this.botz;
+		// 		this.chargeCreated = true;
+		// 		chargeID++;
+		// 		holes.push(newCharge);
+		// 	}
+		// }
 
 		// Scatter directions of charges randomly according to scatter interval defined in sketch.js
 		if (willScatter && random(1)) {
