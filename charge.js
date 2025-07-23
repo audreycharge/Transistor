@@ -363,11 +363,11 @@ class Charge {
 		let x = this.x - base.x;
 		let y = this.y - base.y;
 
-		if (x < base.width && x > 0 && y < base.height && y > 0) {
+		if (x < base.width && x > 0 && y < base.height && y > 0 && exOn) {
 			// width of transistor = 640, height = 320 
 			let width = base.width/20 //calculate width of each section
 			let col = Math.floor(x / width); // Assuming we have obtained electric field in 20 regions
-			print(col)
+			// print(col)
 
 			// Assign Ex and Ez to data
 			Ez = 0
@@ -380,7 +380,7 @@ class Charge {
 		}
 
 		// Multpliy the electric field by a constant to convert it to accelration on screen. Find best value with trial and error.
-		let accelFactor = 0.5;
+		let accelFactor = 0.01;
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ez * accelFactor;
 

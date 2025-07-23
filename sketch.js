@@ -187,6 +187,8 @@ let vdOn; // drain on/off
 let vgCharge; // actual vg charge amount in V
 let vdCharge; // actual vd charge amount in mA
 
+let exOn; // electric field on/off
+
 let dopants = 0; // value controlling the gradient of fixed charges distribution
 let dopantBuckets = []; // array to store number of fixed negative charges per column
 let holeBuckets = []; // aray to store number of holes per column;
@@ -970,6 +972,12 @@ function toggleVGSlider(state) {
 			slider.disabled = true;
 		});
 	}
+}
+
+function toggleEx() {
+	let toggleVal = document.querySelector("#fieldToggle").checked;
+	print(toggleVal)
+	exOn = toggleVal;
 }
 
 function setBand(band) {
