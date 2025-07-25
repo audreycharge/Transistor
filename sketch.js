@@ -37,6 +37,8 @@ let color = {
 	generation: [0, 158, 115],
 	recom: [152, 152, 152],
 	brand: [255, 247, 174],
+	CDColor: [2, 104, 255], // charge density
+	EFColor: [218, 112, 214],
 };
 
 // [vars] Dimensions ============================================================
@@ -155,6 +157,8 @@ let willScatter; // used for charge.js to tell charges to scatter or not at curr
 
 let initHoleCount = 200; // initial hole count at beginning of scene
 let initElectronCount = 100; // source and drain each
+
+let switchGraph = false; //turn on or off the switch between charge density and electric field graph
 
 // [vars] Effects for generation & recombination ===============================================
 
@@ -321,7 +325,7 @@ function draw() {
 			updateCharges();
 			// drawWires();
 			drawBandDiagram();
-			// drawGraph();
+			drawGraph();
 			updateWireElectrons();
 			drawMetalCharges();
 			stabilizeChargeCount();
@@ -1306,6 +1310,19 @@ function scatter() {
 	}
 }
 
+// switch graph
+function mouseClicked() {
+	timeSinceLastInteraction = 0; // reset for checkTimeout function
+	let xCondition = base.x + 45 - mouseX; // left border of right button
+	let yCondition = abs(base.vdY - 16 - mouseY); // top border of right button
+	if (xCondition < 100 && xCondition < 0 && yCondition < 16 * sy) {
+		switchGraph = true; // show charge density graph
+		print(switchGraph)
+	} else if (abs(base.x + 4 - mouseX) < 100 && yCondition < 16 * sy) {
+		switchGraph = false; // show electric field graph
+	}
+}
+
 // Drawing Functions ============================================================
 function drawBase() {
 	// Function: Draws transistor
@@ -1315,86 +1332,22 @@ function drawBase() {
 	strokeWeight(1);
 	canvas.drawingContext.setLineDash([]);
 
-	// source
-	// rect(base.x, base.y, base.sourceWidth, base.sourceHeight, base.smallRadius);
-
-	// drain
-	// rect(
-	// 	base.x + base.width - base.sourceWidth,
-	// 	base.y,
-	// 	base.sourceWidth,
-	// 	base.sourceHeight,
-	// 	base.smallRadius
-	// );
-
-	// oxide
-	// rect(
-	// 	base.metalX,
-	// 	base.y - base.metalHeight,
-	// 	base.metalWidth,
-	// 	base.metalHeight,
-	// 	base.smallRadius
-	// );
-
-	// gate metal
-	// rect(
-	// 	base.metalX,
-	// 	base.y - base.metalHeight * 2,
-	// 	base.metalWidth,
-	// 	base.metalHeight,
-	// 	base.smallRadius
-	// );
-
-	// metal above source
-	// rect(
-	// 	base.x,
-	// 	base.y - base.metalHeight,
-	// 	base.sourceWidth,
-	// 	base.metalHeight,
-	// 	base.smallRadius
-	// );
-
-	// metal above drain
-	// rect(
-	// 	base.drainX,
-	// 	base.y - base.metalHeight,
-	// 	base.sourceWidth,
-	// 	base.metalHeight,
-	// 	base.smallRadius
-	// );
-
 	noFill();
+
+	// charge density electric field
+	rect(
+		base.x,
+		base.vdY,
+		base.width,
+		base.y - base.vdY,
+		base.smallRadius
+	)
 
 	// substrate
 	rect(base.x, base.y, base.width, base.height, base.largeRadius);
 
 	// bottom metal
 	noFill();
-	// rect(
-	// 	base.x,
-	// 	base.y + base.height,
-	// 	base.width,
-	// 	base.bottomMetalHeight,
-	// 	base.largeRadius
-	// );
-
-	// bottom ground
-	// image(
-	// 	groundImg,
-	// 	base.midX - 14,
-	// 	base.endY + base.bottomMetalHeight,
-	// 	groundImg.width / 1.2,
-	// 	groundImg.height / 1.2
-	// );
-
-	// left ground
-	// image(
-	// 	leftGroundImg,
-	// 	base.leftGroundX + 10,
-	// 	base.vgY - 15.5,
-	// 	leftGroundImg.width,
-	// 	leftGroundImg.height
-	// );
 
 	// drain current label + number
 	styleText();
@@ -1412,33 +1365,6 @@ function drawBase() {
 	styleText();
 	textAlign(CENTER);
 	text("Substrate", base.midX, base.y + base.height / 2);
-	// text("Source", base.x + base.sourceWidth / 2, base.y + base.sourceHeight / 2);
-
-	// // source metal
-	// text("Metal", base.x + base.sourceWidth / 2, base.oxideLabelY);
-
-	// // drain metal
-	// text("Metal", base.drainX + base.sourceWidth / 2, base.oxideLabelY);
-
-	// // drain
-	// text(
-	// 	"Drain",
-	// 	base.drainX + base.sourceWidth / 2,
-	// 	base.y + base.sourceHeight / 2
-	// );
-
-	// // top metal
-	// text("Metal", base.midX, base.y - base.metalHeight * 1.35);
-
-	// // oxide
-	// text("Oxide", base.midX, base.oxideLabelY);
-
-	// // bottom metal
-	// text(
-	// 	"Metal",
-	// 	base.midX,
-	// 	base.y + base.height + base.bottomMetalHeight / 2 + 8
-	// );
 }
 
 function drawWires() {
@@ -1543,349 +1469,69 @@ function toggleScaleGraph() {
 }
 
 function drawGraph() {
-	// Function: Draw graph + data
+	// Buttons to swtich between E-field / charge density
+	noFill();
+	noStroke();
+	if (switchGraph) {
+		// electric field is showing
+		stroke(...color.EFColor);
+		fill(...color.EFColor, 80);
+		rect(
+			base.x + 120,
+			(base.vdY + 6),
+			94,
+			24,
+			5,
+			5
+		);
 
-	// variables for dynamic axes based on highest peak of efx or efz
-	let efPeak = 0; // highest peak of ef
-	let graphMaxX = 100; // max # pixels that graph takes up in (+-)x direction
-	let numTicks = 10; // number of x-axis ticks + labels
-	let maxRange = 0; // max value of current x range (based on efPeak)
-	let graphScale = 100; // used to scale data being plotted
-	let xTickMultiplier = 0; // for plotting x tick labels
-
-	let mouseInTransistor =
-		mouseX / sx > base.x && mouseX / sx - base.x < base.width; // is mouse being hovered over transistor
-
-	getPeak(); // get highest peak
-	drawAxes();
-	getXRange(); // get EF amount axis range depending on highest peak
-
-	if (mouseInTransistor) {
-		// Draw hover line at mouse X and updates ef data based on position
-		drawHoverLine();
-		drawEFData();
-		drawEFTicks();
-	}
-
-	function updateHoverColumn(x) {
-		hoverColumn = Math.floor(x / 10); // set ef data column based on mouse
-	}
-
-	function drawHoverLine() {
-		// Function: Draws line at mouse position to represent what position the EF graph is plotting
-		noFill();
-		stroke(...color.graph, 220);
-		strokeWeight(1);
-
-		// graph hover line at mouseX
-		line(mouseX / sx, base.y, mouseX / sx, base.endY);
-		updateHoverColumn(mouseX / sx - base.x);
-	}
-
-	drawTransistorWidth();
-
-	function drawTransistorWidth() {
-		// Function: draws axis to display transistor width on bottom
-		let y = base.endY + 72;
-
-		// draw right arrow
-		noFill();
-		stroke(...color.graph, 220);
-		line(base.x, y, base.endX, y);
-
-		fill(...color.graph);
-		drawTriangle(8, "r", base.endX + 8, y);
-
-		// draw ticks
+		// charge density outline when not active
 		stroke(...color.graph);
-		let tickHeight = 8;
-		line(base.x, y, base.x, y + tickHeight); // begin transistor
-		line(base.sourceEndX, y, base.sourceEndX, y + tickHeight); // end of source
-		line(base.midX, y, base.midX, y + tickHeight); // middle of transistor
-		line(base.drainX, y, base.drainX, y + tickHeight); // start of drain
-
-		// draw width num & units
-		textSize(12);
-		noStroke();
-		fill(...color.graph);
-		textAlign(CENTER);
-		text("0\u00B5m", base.x, y + 24);
-		text(".5\u00B5m", base.sourceEndX, y + 24);
-		text("1\u00B5m", base.midX, y + 24);
-		text("1.5\u00B5m", base.drainX, y + 24);
-		text("2\u00B5m", base.endX, y + 24);
-
-		// x axis label
-		textSize(18);
-		fill(...color.graph);
-		noStroke();
-		strokeWeight(1);
-		text("x", base.x - 20, y + 6); // left side
-	}
-
-	function drawAxes() {
-		// Function: draws lines for x and z axes
 		noFill();
-		stroke(...color.graph, 220);
-		strokeWeight(1);
-		textSize(12);
-		textAlign(CENTER);
-
-		// graph z axis
-		line(base.graphX, base.graphY, base.graphX, base.endY + 6);
-
-		// .5 micrometer
-		let x = base.graphX;
-		let y = base.y + base.sourceHeight;
-
+		rect(
+			base.x + 6,
+			(base.vdY + 6),
+			108,
+			24,
+			5,
+			5
+		);
+	} else {
+		// charge density is showing
+		stroke(...color.CDColor);
+		fill(...color.CDColor, 80);
+		rect(
+			base.x + 6,
+			(base.vdY + 6),
+			108,
+			24,
+			5,
+			5
+		);
+		// electric field outline
+		stroke(...color.graph);
 		noFill();
-		stroke(...color.graph, 220);
-		strokeWeight(1);
-		line(x, y, x - 5, y); // Draw the line
-
-		fill(...color.graph, 220);
-		noStroke();
-		text(".5\u00B5m", x - 24, y + 4);
-
-		// 1 micrometer
-		x = base.graphX;
-		y = base.y + base.height;
-
-		noFill();
-		stroke(...color.graph, 220);
-		strokeWeight(1);
-		line(x, y, x - 5, y); // Draw the line
-		fill(...color.graph, 220);
-		noStroke();
-		text("1\u00B5m", x - 24, y + 4);
-
-		noFill();
-		stroke(...color.graph, 180);
-		strokeWeight(1);
-
-		// graph x axis
-		line(8, base.graphY, base.graphX + 120, base.graphY); // starts at left edge of canvas
-
-		fill(...color.graph);
-		drawTriangle(8, "r", base.graphX + 120, base.graphY); // left
-		drawTriangle(8, "d", base.graphX, base.endY + 6);
-
-		// z axis label
-		textSize(18);
-		noStroke();
-		text("z", base.graphX, base.endY + 36);
+		rect(
+			base.x + 120,
+			(base.vdY + 6),
+			94,
+			24,
+			5,
+			5
+		);
 	}
 
-	function drawTriangle(size, dir, x, y) {
-		// Function: draws arrows at ends of axes (given direction it faces)
-		let wScale = 1.7; // scales width
-		if (dir == "r") {
-			triangle(x, y, x - size, y - size / wScale, x - size, y + size / wScale);
-		} else if (dir == "l") {
-			triangle(x, y, x + size, y - size / wScale, x + size, y + size / wScale);
-		} else if (dir == "d") {
-			triangle(x - size / wScale, y, x + size / wScale, y, x, y + size);
-		}
-	}
+	// text
 
-	function getXRange() {
-		// Function: Get range of x axis depending on highest peak in EF data
-		// Includes: (1-5V/cm , 1-10V/cm, 1-20V/cm, 1-30V/cm, 1-40V/cm, 1-50V/cm)
+	fill(...color.graph);
 
-		// some ranges allow for some tolerance because some of the data is close to the values used (ex. 5001, 1002, 31065)
-		kvPeak = efPeak / 1000;
-		console.log('kvfPeak', kvPeak);
-		if (kvPeak > 0 && kvPeak <= 5) {
-			numTicks = 5;
-			xTickMultiplier = 1;
-			maxRange = 5;
-		} else if (kvPeak > 5 && kvPeak <= 10) {
-			numTicks = 5;
-			xTickMultiplier = 2;
-			maxRange = 10;
-		} else if (kvPeak > 10 && kvPeak <= 20) {
-			numTicks = 2;
-			xTickMultiplier = 10;
-			maxRange = 20;
-		} else if (kvPeak > 20 && kvPeak <= 30) {
-			numTicks = 3;
-			xTickMultiplier = 10;
-			maxRange = 30;
-		} else if (kvPeak > 30 && kvPeak <= 40) {
-			numTicks = 4;
-			xTickMultiplier = 10;
-			maxRange = 40;
-		} else if (kvPeak > 40 && kvPeak <= 50) {
-			numTicks = 5;
-			xTickMultiplier = 10;
-			maxRange = 50;
-		}
-		else if (kvPeak > 50 ) {
-			numTicks = 2;
-			xTickMultiplier = 100;
-			maxRange = 500;
-		}
-	}
+	// strokeWeight(1);
+	fill(102, 194, 255, 180);
+	textSize(14 * sx);
 
-	function drawEFTicks() {
-		// Function: draws a discrete range of x values based on max range
-
-		// draw unit
-		textSize(12);
-		textAlign(CENTER);
-		noStroke();
-		fill(...color.graph);
-		text("KV/cm", base.graphX + graphMaxX, base.graphY + 30);
-
-		// draw ticks
-		// // draw + EF amount axis ticks + labels
-		for (let i = 1; i <= numTicks; i++) {
-			let distanceBetween = graphMaxX / numTicks;
-			let x = base.graphX + i * distanceBetween;
-
-			let y = base.graphY;
-			if (x < base.x) {
-				stroke(...color.graph);
-				line(x, y, x, y - 5); // Draw the line
-
-				noStroke();
-				fill(...color.graph);
-				text(`${i * xTickMultiplier}`, x, y + 16);
-			}
-		}
-
-		// draw - EF amount axis ticks + labels
-		for (let i = 1; i <= numTicks; i++) {
-			let x = base.graphX - (i * graphMaxX) / numTicks;
-			let y = base.graphY;
-			if (x < base.x) {
-				stroke(...color.graph);
-				line(x, y, x, y - 5); // Draw the line
-
-				noStroke();
-				fill(...color.graph);
-				text(`-${i * xTickMultiplier}`, x, y + 16);
-			}
-		}
-	}
-
-	function getPeak() {
-		// Function: get highest peak of efx or efz data
-
-		if (scaleGraphOn) {
-			for (let row = 0; row < efGrid.length; row++) {
-				// for every row, get efx and efz at hovered col
-				let efz = efGrid[row][hoverColumn].efz;
-				let efx = efGrid[row][hoverColumn].efx;
-
-				if (
-					Math.abs(efz) > Math.abs(efPeak) &&
-					(graphMode == "z" || graphMode == "both")
-				) {
-					// scale peak to efz if graph modes include z or both
-					efPeak = Math.abs(efz);
-				}
-				if (
-					Math.abs(efx) > Math.abs(efPeak) &&
-					(graphMode == "x" || graphMode == "both")
-				) {
-					// scale peak to efx if graph modes include x or both
-					efPeak = Math.abs(efx);
-				}
-			}
-		} else {
-			// if scaleGraphOn is set to false - set default efPeak to highest possible efPeak
-			if (graphMode == "x"){efPeak = 20000; }
-			else {efPeak = 500000;}
-		}
-	}
-
-	function drawEFData() {
-		// Function: Plots electric field data
-
-		// draw graph legend labels
-		styleText();
-
-		// set scale
-		graphScale = efPeak / graphMaxX; // divisor is pixel value beyond x axis where max will be drawn
-		// get percentage of ef max compared to discrete range max
-		let percent = efPeak / 1000 / maxRange; // percentage good
-
-		// scale graphscale by percentage to graph at percentage
-		graphScale = graphScale / percent;
-
-		console.log('raphScale', graphScale);
-		
-
-		//console.log('efx', efGrid[0][hoverColumn].efx);
-
-
-		// graph ef in x direction
-		if (graphMode == "x" || graphMode == "both") {
-			let efxLabel = { x: 36, y: 280 };
-			styleText();
-			text("Electric field in x direction", efxLabel.x + 20, efxLabel.y + 5);
-			stroke("white");
-			// draw efx label
-			fill(...color.efx, 160);
-			circle(efxLabel.x, efxLabel.y, 20);
-
-			// draw efx data
-			stroke("white");
-			fill(...color.efx, 160);
-
-			// draw efx data
-			beginShape();
-
-			vertex(base.graphX, base.graphY); // plot begin point
-
-			for (let row = 0; row < efGrid.length; row++) {
-				// for every row, plot efx at specific col
-				let efx = efGrid[row][hoverColumn].efx;
-
-				let y = base.graphY + (base.height * row) / 72; // plot over y of transistor
-				let x = base.graphX + efx / graphScale;
-
-				if (x < base.graphX + graphMaxX + 12) {
-					// ^ condition prevents plotting when ef still scaling (happens when mouse hovers too fast)
-					vertex(x, y); // plot all points in between based on data
-				}
-			}
-			vertex(base.graphX, base.graphY + base.height); // plot end point
-			endShape();
-		}
-
-		// graph ef in y direction
-		if (graphMode == "z" || graphMode == "both") {
-			let efzLabel = { x: 36, y: 310 };
-			styleText();
-			text("Electric field in z direction", efzLabel.x + 20, efzLabel.y + 5);
-
-			// draw efz label
-			stroke("white");
-			fill(...color.efz, 160);
-			circle(efzLabel.x, efzLabel.y, 20);
-
-			// draw efz data
-			stroke("white");
-			fill(...color.efz, 160);
-
-			beginShape();
-			vertex(base.graphX, base.graphY); // plot begin point
-			for (let row = 0; row < efGrid.length; row++) {
-				// for every row, plot efz at specific col
-				let efz = efGrid[row][hoverColumn].efz;
-
-				let y = base.graphY + (base.height * row) / 72;
-				let x = base.graphX + efz / graphScale;
-				if (x < base.graphX + graphMaxX + 12) {
-					vertex(x, y); // plot all points in between based on data
-				}
-			}
-			vertex(base.graphX, base.graphY + base.height); // plot end point (close shape)
-			endShape();
-		}
-	}
+	text("Band Diagram", 160 * sx, 30 * sy);
+	text("Charge Density", base.x + 10 + 50, (base.vdY + 22));
+	text("Electric Field", base.x + 116 + 50, (base.vdY + 22));
 }
 
 function drawBandDiagram() {
