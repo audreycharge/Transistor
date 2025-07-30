@@ -255,6 +255,8 @@ let EFData = []; // current electric field data
 let graphMode = "both"; // graph ef in x direction, ef in z direction, or both (selected by html ToggleGroup)
 let scaleGraphOn = true; // scale graph to highest peak (selected by html switch)
 
+let graphTextSize = 12;
+
 // Displayed parameters ============================================================
 let parameters = {
 	"Source/Drain Doping Density": "",
@@ -1313,12 +1315,13 @@ function scatter() {
 // switch graph
 function mouseClicked() {
 	timeSinceLastInteraction = 0; // reset for checkTimeout function
-	let xCondition = base.x + 45 - mouseX; // left border of right button
-	let yCondition = abs(base.vdY - 16 - mouseY); // top border of right button
-	if (xCondition < 100 && xCondition < 0 && yCondition < 16 * sy) {
+	let xCondition = (base.x + 120 - mouseX/sx); // left border of right button aka the grid
+	let yCondition = abs(base.vdY + 6 - mouseY/sx); // top border of right button
+	print(yCondition)
+	if (xCondition < 100 && xCondition < 0 && yCondition < 28) { //if the mouse is on the right button?
 		switchGraph = true; // show charge density graph
 		print(switchGraph)
-	} else if (abs(base.x + 4 - mouseX) < 100 && yCondition < 16 * sy) {
+	} else if (abs(base.x + 4 - mouseX) < 100 && yCondition < 28) {
 		switchGraph = false; // show electric field graph
 	}
 }
@@ -1469,6 +1472,125 @@ function toggleScaleGraph() {
 }
 
 function drawGraph() {
+	textAlign(LEFT)
+	stroke(...color.graph, 180);
+	// x axis line
+	line(base.x+10, 270, 890, 270);
+	// y axis line
+	let xStart = base.x + 10;
+	line(xStart, 204, xStart, 335);
+
+	let numXTicks = 7;
+
+	// x axis ticks
+	for (let i = 0; i < numXTicks; i++) {
+		stroke(...color.graph, 180);
+		let x = (xStart + 100 * i);
+		let y = 270;
+		line(x, y, x, y - 5); // Draw the line
+
+		// tick label
+		if (i < numXTicks - 1) {
+			noStroke();
+			fill(102, 194, 255, 180);
+			textSize(graphTextSize);
+
+			text(`${50 * (i + 1)} nm`, (80 + (xStart + 101 * i)), 288);
+		}
+	}
+	stroke(...color.graph, 180);
+	if (switchGraph == false) {
+		// negative charge density y axis ticks
+		for (let i = 0; i < 4; i++) {
+			stroke(...color.graph, 180);
+			let x = base.x + 10;
+			let y = (340 / 2 + 98) + 12.5 + 12.5 * i;
+			line(x, y, x + 5, y); // Draw the line
+
+			noStroke();
+			fill(102, 194, 255, 180);
+			textSize(graphTextSize);
+			// only show units at end points
+			if (i == 3) {
+				text(`${-10 * (i + 1)} mC/cm`, x + 10, y - 4, x + 5, y);
+				textSize(graphTextSize - 2);
+				text(`3`, x + 68, y - 5, x + 5, y); // cubed superscript
+			} else {
+				text(`${-10 * (i + 1)}`, x + 10, y - 4, x + 5, y);
+			}
+		}
+		//positive charge density y axis ticks
+		for (let i = 0; i < 4; i++) {
+			stroke(...color.graph, 180);
+			let x = base.x + 10;
+			let y = (340 / 2 + 98) - 12.5 - 12.5 * i;
+			line(x, y, x + 5, y); // Draw the line
+
+			noStroke();
+			fill(102, 194, 255, 180);
+			textSize(graphTextSize);
+			// only show units at end points
+			if (i == 3) {
+				text(`${10 * (i + 1)} mC/cm`, x + 10, y - 4, x + 5, y);
+				textSize(graphTextSize - 2);
+				text(`3`, x + 64, y - 5, x + 5, y);
+			} else {
+				text(`${10 * (i + 1)}`, x + 10, y - 4, x + 5, y);
+			}
+		}
+	} else {
+		// negative electric field y axis ticks
+		for (let i = 0; i < 4; i++) {
+			stroke(...color.graph, 180);
+			let x = base.x + 10;
+			let y =
+				(340 / 2 + 98) +
+				(40 / 1530) * 500 +
+				(40 / 1530) * 500 * i;
+			line(x, y, x + 5, y); // Draw the line
+			noStroke();
+			fill(...color.graph, 180);
+			textSize(graphTextSize);
+			// only show units at end points
+			if (i == 3) {
+				text(
+					`${(0.1 * (i + 1)).toFixed(1)} MV/cm`,
+					x + 10,
+					y - 4,
+					x + 5,
+					y
+				);
+			} else {
+				text(`${(0.1 * (i + 1)).toFixed(1)}`, x + 10, y - 4, x + 5, y);
+			}
+		}
+		// positive electric field y axis ticks
+		for (let i = 0; i < 4; i++) {
+			stroke(...color.graph, 180);
+			let x = base.x+10;
+			let y =
+				(340 / 2 + 98) -
+				(40 / 1530) * 500 -
+				(40 / 1530) * 500 * i;
+			line(x, y, x + 5, y); // Draw the line
+			noStroke();
+			fill(...color.graph, 180);
+			textSize(graphTextSize);
+			// only show units at end points
+			if (i == 3) {
+				text(
+					`${(0.1 * (i + 1)).toFixed(1)} MV/cm`,
+					x + 10,
+					y - 4,
+					x + 5,
+					y
+				);
+			} else {
+				text(`${(0.1 * (i + 1)).toFixed(1)}`, x + 10, y - 4, x + 5, y);
+			}
+		}
+	}
+
 	// Buttons to swtich between E-field / charge density
 	noFill();
 	noStroke();
@@ -1527,9 +1649,10 @@ function drawGraph() {
 
 	// strokeWeight(1);
 	fill(102, 194, 255, 180);
-	textSize(14 * sx);
+	textSize(14);
+	textAlign(CENTER)
 
-	text("Band Diagram", 160 * sx, 30 * sy);
+	text("Band Diagram", 160, 30);
 	text("Charge Density", base.x + 10 + 50, (base.vdY + 22));
 	text("Electric Field", base.x + 116 + 50, (base.vdY + 22));
 }
