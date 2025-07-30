@@ -328,7 +328,7 @@ function draw() {
 			// drawWires();
 			drawBandDiagram();
 			drawGraph();
-			updateWireElectrons();
+			// updateWireElectrons();
 			drawMetalCharges();
 			stabilizeChargeCount();
 		}
@@ -1183,7 +1183,7 @@ function updateVG(value) {
 	if (vgLoopDirection == 0) {
 		resetMetalCharges();
 	}
-	toggleVGSlider("off");
+	// toggleVGSlider("off");
 	resetVGLoop(vgLoopDirection);
 	updateDrainCurrent();
 }
