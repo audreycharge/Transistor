@@ -234,7 +234,7 @@ class Charge {
 		this.position.add(this.velocity); // Update this.position based on its velocity
 		this.x = this.position.x;
 		this.y = this.position.y;
-		this.moveBandDiagram();
+		// this.moveBandDiagram();
 
 		// Bounce off boundaries
 		let buffer = 3;

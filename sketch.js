@@ -38,6 +38,8 @@ let color = {
 	recom: [152, 152, 152],
 	brand: [255, 247, 174],
 	CDColor: [2, 104, 255], // charge density
+	electricFieldOpacity: 160,
+	chargeDensityOpacity: 160,
 	EFColor: [218, 112, 214],
 };
 
@@ -155,10 +157,8 @@ let scatterCount = 20; // count down to next scatter
 let scatterInterval; // how often charges scatter
 let willScatter; // used for charge.js to tell charges to scatter or not at current time
 
-let initHoleCount = 200; // initial hole count at beginning of scene
+let initHoleCount = 440; // initial hole count at beginning of scene
 let initElectronCount = 100; // source and drain each
-
-let switchGraph = false; //turn on or off the switch between charge density and electric field graph
 
 // [vars] Effects for generation & recombination ===============================================
 
@@ -191,13 +191,20 @@ let vdOn; // drain on/off
 let vgCharge; // actual vg charge amount in V
 let vdCharge; // actual vd charge amount in mA
 
+
+// [vars] Toggling electric field and charge density in doping
 let exOn; // electric field on/off
+let dopingConcen_new = 0; // doping concentration
+let switchGraph = false; //turn on or off the switch between charge density and electric field graph
+
 
 let dopants = 0; // value controlling the gradient of fixed charges distribution
 let dopantBuckets = []; // array to store number of fixed negative charges per column
 let holeBuckets = []; // aray to store number of holes per column;
 let chargeBuckets = []; // array to store resultant charge per column;
 let electricFIeldBuckets = []; // array to store electric field per column
+let constant_A = 0.5; //constant that determines relationship between electric field and charge
+let constant_B = 0.2; //constant that determines relationship between electric field and band diagram
 
 let dis1 = base.wire.leftMetal.y - base.wire.vdLeft.y; // vg left wire length
 let dis2 = base.wire.vdRight.x - base.wire.vdLeft.x; // vg middle wire length
@@ -565,13 +572,14 @@ function initCharges() {
 	// }
 
 	// initialize fixed negative charges in substrate
-	let sections = 5;
+	let sections = 10;
 	let dotCount = []
 	// let d = 16; //0-16
 	let sec = base.width/sections;
 	let a1 = (fixedNegCharges*2/sections - (sections - 1)*dopants)/2;
 	// let an = a1 + (sections-1)*d;
 	dotCount.push(a1);
+	print(a1)
 
 	for (let n = 1; n < sections; n++) {
 		an = a1 + n*dopants
@@ -582,7 +590,13 @@ function initCharges() {
 		for (let fn = 0; fn < dotCount[i]; fn++) {
 			let x = 0;
 			let y = 0;
-			x = random(sec*i + base.x + buffer, sec*(i+1)+ base.x - buffer)
+			if (i == 0) {
+				x = random(sec*i + base.x + buffer, sec*(i+1)+ base.x)
+			} else if (i == sections - 1) {
+				x = random(sec*i + base.x, sec*(i+1)+ base.x - buffer)
+			} else {
+				x = random(sec*i + base.x, sec*(i+1)+ base.x)
+			}
 			y = random(base.y + buffer, base.y + base.height)
 			fixedCharges.push(new Charge(x, y, "fn", chargeID));
 			
@@ -1072,13 +1086,16 @@ function updateVD(value) {
 	updateDrainCurrent();
 }
 
-function updateDopants(value) {
+function updateDopingConcentration(value) {
 	// Function: handles doping slider change
 	//higher the slide, the larger the gradient
 	// print(value)
-	let valuetoDopeMap = [0, 4, 8, 12, 16];
+	let valuetoDopeMap = [0, 2, 4, 6, 8];
 	dopants = valuetoDopeMap[value];
 	resetScene()
+
+
+
 
 }
 
@@ -1236,19 +1253,15 @@ function updateCharges() {
 		holeBuckets[bucketID]++;
 	}
 
-	//update chargeBuckets
-	// for (let i = 0; i < 20; i++) {
-	// 	chargeBuckets[i] = holeBuckets[i] - dopantBuckets[i];
-	// }
-
-	//update electricFieldBuckets
+	//update chargeBuckets and electricFieldBuckets
 	let chargeTotal = 0;
 	for (let i = 0; i < 20; i++) {
-		let chargeBucket = holeBuckets[i] - dopantBuckets[i];
-		chargeTotal += chargeBucket;
-		electricFIeldBuckets[i] = chargeTotal;
+		chargeBuckets[i] = holeBuckets[i] - dopantBuckets[i];
+		chargeTotal += chargeBuckets[i];
+		electricFIeldBuckets[i] = chargeTotal * constant_A;
 	}
-	// print(electricFIeldBuckets)
+
+	// print(chargeBuckets);
 
 	// Check for recombination
 	// if (recomOn) {
@@ -1317,10 +1330,10 @@ function mouseClicked() {
 	timeSinceLastInteraction = 0; // reset for checkTimeout function
 	let xCondition = (base.x + 120 - mouseX/sx); // left border of right button aka the grid
 	let yCondition = abs(base.vdY + 6 - mouseY/sx); // top border of right button
-	print(yCondition)
+	// print(yCondition)
 	if (xCondition < 100 && xCondition < 0 && yCondition < 28) { //if the mouse is on the right button?
 		switchGraph = true; // show charge density graph
-		print(switchGraph)
+		// print(switchGraph)
 	} else if (abs(base.x + 4 - mouseX) < 100 && yCondition < 28) {
 		switchGraph = false; // show electric field graph
 	}
@@ -1655,6 +1668,48 @@ function drawGraph() {
 	text("Band Diagram", 160, 30);
 	text("Charge Density", base.x + 10 + 50, (base.vdY + 22));
 	text("Electric Field", base.x + 116 + 50, (base.vdY + 22));
+
+	drawChargeDensityData();
+	drawElectricFieldData();
+
+	function drawChargeDensityData() {
+		//////////////////////////////////////////////////// draw charge density when switch is False
+		if (switchGraph == false) {
+			noStroke();
+
+			let gap = (890-xStart) / 19;
+			// print(gap)
+
+			fill(...color.CDColor, color.chargeDensityOpacity);
+			if (chargeBuckets.length > 0) {
+				beginShape()
+				vertex(xStart, 270)
+
+				for (let i = 0; i < chargeBuckets.length; i++) {
+					vertex(i*gap + xStart, 270 - chargeBuckets[i])
+				}
+				vertex(890, 270)
+				endShape()
+			}
+		}
+	}
+	function drawElectricFieldData() {
+		//////////////////////////////////////////////////// draw E-field graph on second graph when switch is On, and draw charge density graph when not clicked switch
+		if (switchGraph == true) {
+			noStroke();
+
+			fill(218, 112, 214, 100);
+			if (electricFIeldBuckets.length > 0) {
+				beginShape()
+				vertex(xStart, 270)
+				for (let i = 0; i < electricFIeldBuckets.length; i++) {
+					vertex(i*33 + xStart, 270 - electricFIeldBuckets[i]*2)
+					// point(i*33 + xStart, 270 - electricFIeldBuckets[i]*2)
+				}
+				endShape()
+			}
+		}
+	}
 }
 
 function drawBandDiagram() {
@@ -1689,31 +1744,58 @@ function drawBandDiagram() {
 	let bandLength = 62;
 
 	// draw electron curve
-	beginShape();
-	for (var k = 0; k < bandLength; k++) {
-		let columns = 64;
-		let vertexX = base.x + (base.width * k) / columns;
-		let vertexY = base.bandY - bandData[k] * 40 - 100;
-		curveVertex(vertexX, vertexY);
-		electronBand[k] = [vertexX, vertexY];
+	//TODO: add the elcrtic bucket fields
+	// beginShape();
+	// for (var k = 0; k < bandLength; k++) {
+	// 	let columns = 64;
+	// 	let vertexX = base.x + (base.width * k) / columns;
+	// 	let vertexY = base.bandY - bandData[k] * 40 - 100;
+	// 	curveVertex(vertexX, vertexY);
+	// 	electronBand[k] = [vertexX, vertexY];
+	// }
+	if (electricFIeldBuckets.length > 0) {
+		beginShape()
+		let total = 0;
+		vertex(base.x, base.bandY - 50)
+		for (let i = 0; i < electricFIeldBuckets.length; i++) {
+			total += electricFIeldBuckets[i];
+			let vertexX = base.x + (base.width * i)/electricFIeldBuckets.length;
+			let vertexY = base.bandY - total*constant_B;
+			curveVertex(vertexX, vertexY - 50)
+			// point(i*33 + xStart, 270 - electricFIeldBuckets[i]*2)
+		}
+		endShape()
 	}
-	endShape();
+	// endShape();
 
 	// draw hole curve
 	stroke(...color.hole);
-	beginShape();
-
-	for (var k = 0; k < bandLength; k++) {
-		//hole curve
-		let columns = 64;
-		let vertexX = base.x + (base.width * k) / columns;
-		let vertexY = base.bandY - bandData[k] * 40;
-		let bandGap = -60;
-
-		curveVertex(vertexX, vertexY + bandGap);
-		holeBand[k] = [vertexX, vertexY + bandGap];
+	if (electricFIeldBuckets.length > 0) {
+		beginShape()
+		let total = 0;
+		vertex(base.x, base.bandY)
+		for (let i = 0; i < electricFIeldBuckets.length; i++) {
+			total += electricFIeldBuckets[i];
+			let vertexX = base.x + (base.width * i)/electricFIeldBuckets.length;
+			let vertexY = base.bandY - total*constant_B;
+			curveVertex(vertexX, vertexY)
+			// point(i*33 + xStart, 270 - electricFIeldBuckets[i]*2)
+		}
+		endShape()
 	}
-	endShape();
+	// beginShape();
+
+	// for (var k = 0; k < bandLength; k++) {
+	// 	//hole curve
+	// 	let columns = 64;
+	// 	let vertexX = base.x + (base.width * k) / columns;
+	// 	let vertexY = base.bandY - bandData[k] * 40;
+	// 	let bandGap = -60;
+
+	// 	curveVertex(vertexX, vertexY + bandGap);
+	// 	holeBand[k] = [vertexX, vertexY + bandGap];
+	// }
+	// endShape();
 
 	noStroke();
 	strokeWeight(1);
